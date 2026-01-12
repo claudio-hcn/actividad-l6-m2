@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Wallet - Últimos Movimientos</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<script>
+  if (!localStorage.getItem('loggedIn')) {
+    window.location.href = 'index.html';
+  }
+</script>
+
+<body class="bg-dark">
+  <div class="container bg-secondary p-3">
+    <h2 class="text-warning text-center">Últimos Movimientos</h2>
+    <ul class="list-group" id="listaMovimientos">
+    </ul>
+    <div class="row mt-5">
+      <div class="col">
+        <a href="menu.html" class="btn btn-primary btn-block text-white">Volver al Menú Principal</a>
+      </div>
+      <div class="col">
+        <a class="btn btn-danger btn-block text-white" id="logout"> Cerrar sesión</a>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+      // Seleccionamos la lista con jQuery
+      const $lista = $('#listaMovimientos');
+      let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
+
+      if (movimientos.length === 0) {
+        // Usamos .html() para insertar el mensaje de lista vacía
+        $lista.html(`
+        <li class="list-group-item text-center">
+            No hay movimientos registrados
+        </li>
+    `);
+      } else {
+        $lista.empty(); // Limpiamos la lista antes de iterar
+
+        movimientos
+          .slice(0, 5) // Solo los últimos 5
+          .forEach(m => {
+            // Creamos el contenido HTML de cada item
+            const contenido = `
+                <li class="list-group-item">
+                    <strong>${m.tipo === 'envio' ? 'Envío' : 'Depósito a cuenta propia'}</strong><br>
+                    ${m.contacto ? 'A: ' + m.contacto + '<br>' : ''}
+                    Monto: $${m.monto.toLocaleString('es-CL')}<br>
+                    <small class="text-muted">${m.fecha}</small>
+                </li>
+            `;
+
+            // Agregamos el item a la lista
+            $lista.append(contenido);
+          });
+      }
+
+      // Evento Logout con jQuery
+      $('#logout').on('click', function () {
+        localStorage.removeItem('loggedIn');
+        window.location.href = 'index.html';
+      });
+
+    </script>
+</body>
+
+</html>

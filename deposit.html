@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Wallet - Depositar</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<script>
+  if (!localStorage.getItem('loggedIn')) {
+    window.location.href = 'index.html';
+  }
+</script>
+
+<body class="bg-dark">
+  <div class="container bg-secondary p-3">
+    <h2 class="text-warning text-center">Depositar</h2>
+    <form>
+      <div class="form-group bg-light p-1">
+        <label>Dinero en cuenta:</label>
+        <h3 id="monto" class="text-center"></h3>
+      </div>
+      <div class="form-group text-center ">
+        <label for="depositAmount" class="text-light">Monto a depositar:</label>
+        <input type="number" class="form-control" id="depositAmount" placeholder="Ingrese el monto">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Realizar depósito</button>
+    </form>
+    <div class="row mt-5">
+      <div class="col">
+        <a href="menu.html" class="btn btn-primary btn-block text-white">Volver al Menú Principal</a>
+      </div>
+      <div class="col">
+
+        <a class="btn btn-danger btn-block text-white" id="logout"> Cerrar sesión</a>
+
+      </div>
+
+
+
+    </div>
+  </div>
+
+  </div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script>
+  // Inicializar saldo si no existe
+  if (!localStorage.getItem('saldo')) {
+    localStorage.setItem('saldo', 60000);
+  }
+
+  const inputDeposito = $('depositAmount');
+ $('form').submit(function (e) {
+    e.preventDefault();
+
+    // Obtenemos el valor usando .val() y lo convertimos a número
+    let deposito = Number($('#depositAmount').val());
+
+    if (deposito <= 0 || isNaN(deposito)) {
+        alert('Ingrese un monto válido');
+        return;
+    }
+
+    // El manejo de localStorage sigue siendo igual (es API nativa del navegador)
+    let saldoActual = Number(localStorage.getItem('saldo'));
+    let nuevoSaldo = saldoActual + deposito;
+
+    // Guardar nuevo saldo
+    localStorage.setItem('saldo', nuevoSaldo);
+
+    alert('Depósito realizado con éxito');
+
+    registrarMovimiento('deposito', null, deposito);
+
+    // Recargar la página
+    location.reload();
+
+    // Limpiar el input con jQuery
+    $('#depositAmount').val('');
+});
+
+  function registrarMovimiento(tipo, contacto, monto) {
+    let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
+
+    movimientos.unshift({
+      tipo,
+      contacto,
+      monto,
+      fecha: new Date().toLocaleString('es-CL')
+    });
+
+    localStorage.setItem('movimientos', JSON.stringify(movimientos));
+  }
+
+  $("#logout").click(function () {
+    localStorage.removeItem('loggedIn');
+    window.location.href = 'index.html';
+  });
+
+// Obtener saldo desde localStorage (esto se mantiene igual)
+let saldo = Number(localStorage.getItem('saldo'));
+
+// Mostrarlo formateado con jQuery
+$('#monto').text('$' + saldo.toLocaleString('es-CL'));
+
+</script>
+
+</html>
